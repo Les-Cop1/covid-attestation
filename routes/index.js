@@ -2,21 +2,33 @@ var express = require('express');
 var router = express.Router();
 const pdfUtils = require('../public/javascripts/pdf-util')
 
+router.get('/', function (req, res, next) {
+    res.status(404).send('Not found');
+})
+
 /* POST home page. */
 router.post('/', function (req, res, next) {
 
+    const reason = req.body["motif"]
 
-    let reasons = ["travail", "achats", "sante", "famille", "handicap", "sport_animaux", "convocation", "missions", "enfants"]
+    let adresse = (req.body["adresse"] === undefined) ? '' : req.body["adresse"];
+    let dateNaissance = (req.body["dateNaissance"] === undefined) ? '' : req.body["dateNaissance"]
+    let ville = (req.body["ville"] === undefined) ? '' : req.body["ville"]
+    let dateSortie = (req.body["dateSortie"] === undefined) ? '' : req.body["dateSortie"]
+    let prenom = (req.body["prenom"] === undefined) ? '' : req.body["prenom"]
+    let heureSortie = (req.body["heureSortie"] === undefined) ? '' : req.body["heureSortie"]
+    let nom = (req.body["nom"] === undefined) ? '' : req.body["nom"]
+    let lieuNaissance = (req.body["lieuNaissance"] === undefined) ? '' : req.body["lieuNaissance"]
+    let codePostal = (req.body["codePostal"] === undefined) ? '' : req.body["codePostal"]
 
-    const reason = reasons[1]
     let profile = {
-        "address": req.body["adresse"],
-        "birthday": req.body["dateNaissance"],
-        "city": req.body["ville"],
-        "datesortie": req.body["dateSortie"],
-        "firstname": req.body["prenom"],
-        "heuresortie": req.body["heureSortie"],
-        "lastname": req.body["nom"],
+        "address":  adresse,
+        "birthday": dateNaissance,
+        "city": ville,
+        "datesortie": dateSortie,
+        "firstname": prenom,
+        "heuresortie": heureSortie,
+        "lastname": nom,
         "ox - achats": "achats",
         "ox - convocation": "convocation",
         "ox - enfants": "enfants",
@@ -26,8 +38,8 @@ router.post('/', function (req, res, next) {
         "ox - sante": "sante",
         "ox - sport_animaux": "sport_animaux",
         "ox - travail": "travail",
-        "placeofbirth": req.body["lieuNaissance"],
-        "zipcode": req.body["codePostal"]
+        "placeofbirth": lieuNaissance,
+        "zipcode": codePostal
     }
 
     getBuffer(profile, reason)

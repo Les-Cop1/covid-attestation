@@ -114,6 +114,7 @@ async function generatePdf(profile, reasons, pdfBase) {
     }
 
     drawText(profile.city, 105, 177, locationSize)
+    
     drawText(`${profile.datesortie}`, 91, 153, 11)
     drawText(`${profile.heuresortie}`, 264, 153, 11)
 
