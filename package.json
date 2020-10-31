@@ -1,0 +1,29 @@
+{
+  "name": "covid-attestation",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Application Express pour générer des attestations de déplacement pour le confinement de fin 2020",
+  "author": "Lucas Stoebner & Félix Legrelle",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:Les-Cop1/covid-attesation.git"
+  },
+  "scripts": {
+    "start": "node ./bin/www",
+    "dev": "nodemon ./bin/www"
+  },
+  "dependencies": {
+    "cookie-parser": "~1.4.4",
+    "debug": "~2.6.9",
+    "express": "~4.16.1",
+    "fs": "0.0.1-security",
+    "http-errors": "~1.6.3",
+    "morgan": "~1.9.1",
+    "pdf-lib": "^1.11.2",
+    "pug": "2.0.0-beta11",
+    "qrcode": "^1.4.4"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.6"
+  }
+}
