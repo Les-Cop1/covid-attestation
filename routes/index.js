@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
-const pdfUtils = require('../public/javascripts/pdf-util')
 
+const pdfUtils = require('../public/javascripts/pdf-util')
 
 router.get('/', function (req, res, next) {
 
@@ -14,7 +14,6 @@ router.get('/', function (req, res, next) {
 
 /* POST home page. */
 router.post('/', function (req, res, next) {
-
     let reason = (req.body["motif"] === undefined) ? '' : req.body["motif"]
     let adresse = (req.body["adresse"] === undefined) ? '' : req.body["adresse"];
     let dateNaissance = (req.body["dateNaissance"] === undefined) ? '' : req.body["dateNaissance"]
@@ -53,11 +52,11 @@ router.post('/', function (req, res, next) {
             res.setHeader("Content-disposition", 'filename="' + pdf.title + '.pdf"')
             res.send(Buffer.from(pdf.file))
         })
-
 });
 
 async function getBuffer(profile, reason) {
     return await pdfUtils.generatePdf(profile, reason, './public/assets/certificate.pdf');
 }
+
 
 module.exports = router;

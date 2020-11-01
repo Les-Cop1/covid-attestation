@@ -24,7 +24,7 @@ yarn start
 
 ###Analytics
 Pour mettre en place Google Analytics.<br>
-Initialisez la variable d'environnement `ID_GOOGLE_ANALYTICS` avec votre id (UA-xxxxxxxx-x)
+Initialisez la variable d'environnement `GA_TRACKING_ID` avec votre id (UA-xxxxxxxx-x)
 
 ## Usage
 
