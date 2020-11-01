@@ -22,6 +22,10 @@ Run server :
 yarn start
 ```
 
+###Analytics
+Pour mettre en place Google Analytics.<br>
+Initialisez la variable d'environnement `ID_GOOGLE_ANALYTICS` avec votre id (UA-xxxxxxxx-x)
+
 ## Usage
 
 ### Génération d'attestation

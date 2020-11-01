@@ -33,7 +33,7 @@ function generateQR(text) {
     return QRCode.toDataURL(text, opts)
 }
 
-async function generatePdf(profile, reasons, pdfBase) {
+async function generatePdf(profile, reason, pdfBase) {
     let today = new Date();
     today = new Date(today.getTime() - 5000 * 60)
     let dd = String(today.getDate()).padStart(2, '0');
@@ -66,7 +66,7 @@ async function generatePdf(profile, reasons, pdfBase) {
         `Naissance: ${birthday} a ${placeofbirth}`,
         `Adresse: ${address} ${zipcode} ${city}`,
         `Sortie: ${datesortie} a ${heuresortie}`,
-        `Motifs: ${reasons}`,
+        `Motifs: ${reason}`,
     ].join(';\n ')
 
     const pdfDoc = await PDFDocument.load(fs.readFileSync(pdfBase))
@@ -97,19 +97,11 @@ async function generatePdf(profile, reasons, pdfBase) {
     drawText(birthday, 119, 674)
     drawText(placeofbirth, 297, 674)
     drawText(`${address} ${zipcode} ${city}`, 133, 652)
-    reasons
-        .split(', ')
-        .forEach(reason => {
-            drawText('x', 78, ys[reason], 18)
-        })
+    drawText('x', 78, ys[reason], 18)
 
     let locationSize = getIdealFontSize(font, profile.city, 83, 7, 11)
 
     if (!locationSize) {
-        alert(
-            'Le nom de la ville risque de ne pas être affiché correctement en raison de sa longueur. ' +
-            'Essayez d\'utiliser des abréviations ("Saint" en "St." par exemple) quand cela est possible.',
-        )
         locationSize = 7
     }
 
