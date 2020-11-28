@@ -1,19 +1,20 @@
 const QRCode = require('qrcode')
 const PDFLib = require('pdf-lib');
+const rgb = PDFLib.rgb;
 const PDFDocument = PDFLib.PDFDocument;
 const StandardFonts = PDFLib.StandardFonts;
 let fs = require('fs')
 
 const ys = {
-    travail: 578,
-    achats: 533,
-    sante: 477,
-    famille: 435,
-    handicap: 396,
-    sport_animaux: 358,
-    convocation: 295,
-    missions: 255,
-    enfants: 211,
+    travail: 553,
+    achats_culturel_cultuel: 482,
+    sante: 434,
+    famille: 410,
+    handicap: 373,
+    sport_animaux: 349,
+    convocation: 276,
+    missions: 252,
+    enfants: 228,
 }
 
 function addZero(i) {
@@ -41,12 +42,12 @@ async function generatePdf(profile, reason, pdfBase) {
     let yyyy = today.getFullYear();
 
     let creationDate = dd + '/' + mm + '/' + yyyy;
-    let creationDateT = yyyy + '-' + mm + '-' + dd;
+    let creationDateTitre = yyyy + '-' + mm + '-' + dd;
 
     let h = addZero(today.getHours());
     let m = addZero(today.getMinutes());
     let creationHour = h + "h" + m
-    let creationHourT = h + "-" + m
+    let creationHourTitre = h + "-" + m
     const {
         lastname,
         firstname,
@@ -70,7 +71,7 @@ async function generatePdf(profile, reason, pdfBase) {
     ].join(';\n ')
 
     const pdfDoc = await PDFDocument.load(fs.readFileSync(pdfBase))
-    let title = 'attestation-' + creationDateT + "_" + creationHourT
+    let title = 'attestation-' + creationDateTitre + "_" + creationHourTitre
     pdfDoc.setTitle(title)
     pdfDoc.setSubject('Attestation de déplacement dérogatoire')
     pdfDoc.setKeywords([
@@ -92,12 +93,12 @@ async function generatePdf(profile, reason, pdfBase) {
     const drawText = (text, x, y, size = 11) => {
         page1.drawText(text, {x, y, size, font})
     }
-    drawText(`${firstname} ${lastname}`, 119, 696)
 
-    drawText(birthday, 119, 674)
-    drawText(placeofbirth, 297, 674)
-    drawText(`${address} ${zipcode} ${city}`, 133, 652)
-    drawText('x', 78, ys[reason], 18)
+    drawText(`${firstname} ${lastname}`, 92, 702)
+    drawText(birthday, 92, 684)
+    drawText(placeofbirth, 214, 684)
+    drawText(`${address} ${zipcode} ${city}`, 104, 665)
+    drawText('x', 47, ys[reason], 12)
 
     let locationSize = getIdealFontSize(font, profile.city, 83, 7, 11)
 
@@ -105,27 +106,34 @@ async function generatePdf(profile, reason, pdfBase) {
         locationSize = 7
     }
 
-    drawText(profile.city, 105, 177, locationSize)
+    drawText(profile.city, 78, 76, locationSize)
     
-    drawText(`${profile.datesortie}`, 91, 153, 11)
-    drawText(`${profile.heuresortie}`, 264, 153, 11)
+    drawText(`${profile.datesortie}`, 63, 58, 11)
+    drawText(`${profile.heuresortie}`, 227, 58, 11)
+
+    const qrTitle1 = 'QR-code contenant les informations '
+    const qrTitle2 = 'de votre attestation numérique'
 
     const generatedQR = await generateQR(data)
 
     const qrImage = await pdfDoc.embedPng(generatedQR)
 
+    page1.drawText(qrTitle1 + '\n' + qrTitle2, { x: 440, y: 130, size: 6, font, lineHeight: 10, color: rgb(1,1,1) })
+
+
     page1.drawImage(qrImage, {
         x: page1.getWidth() - 156,
-        y: 100,
+        y: 25,
         width: 92,
         height: 92,
     })
 
     pdfDoc.addPage()
     const page2 = pdfDoc.getPages()[1]
+    page2.drawText(qrTitle1 + qrTitle2, { x: 50, y: page2.getHeight() - 70, size: 11, font, color: rgb(1,1,1) })
     page2.drawImage(qrImage, {
         x: 50,
-        y: page2.getHeight() - 350,
+        y: page2.getHeight() - 390,
         width: 300,
         height: 300,
     })
