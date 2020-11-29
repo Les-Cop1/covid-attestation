@@ -37,6 +37,7 @@ function generateQR(text) {
 async function generatePdf(profile, reason, pdfBase) {
     let today = new Date();
     today = new Date(today.getTime() - 5000 * 60)
+    today.setTime( today.getTime() - new Date().getTimezoneOffset()*60*1000 )
     let dd = String(today.getDate()).padStart(2, '0');
     let mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
     let yyyy = today.getFullYear();
