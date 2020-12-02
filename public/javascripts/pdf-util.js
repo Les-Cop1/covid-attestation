@@ -35,20 +35,9 @@ function generateQR(text) {
 }
 
 async function generatePdf(profile, reason, pdfBase) {
-    let today = new Date();
-    today = new Date(today.getTime() - 5000 * 60)
-    today.setTime( today.getTime() - new Date().getTimezoneOffset()*60*1000 )
-    let dd = String(today.getDate()).padStart(2, '0');
-    let mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
-    let yyyy = today.getFullYear();
+    // Date de création du fichier x minutes avant la date de sortie
+    const minutesBefore = 5
 
-    let creationDate = dd + '/' + mm + '/' + yyyy;
-    let creationDateTitre = yyyy + '-' + mm + '-' + dd;
-
-    let h = addZero(today.getHours());
-    let m = addZero(today.getMinutes());
-    let creationHour = h + "h" + m
-    let creationHourTitre = h + "-" + m
     const {
         lastname,
         firstname,
@@ -60,6 +49,20 @@ async function generatePdf(profile, reason, pdfBase) {
         datesortie,
         heuresortie,
     } = profile
+
+    const dateSortieFormated = `${datesortie.substr(6,4)}-${datesortie.substr(3,2)}-${datesortie.substr(0,2)}`
+    let date = new Date(`${dateSortieFormated} ${heuresortie}`)
+
+    date.setMinutes(date.getMinutes() - minutesBefore)
+
+    const creationDay = addZero(date.getDate()).toString()
+    const creationMonth = addZero(date.getMonth() + 1).toString()
+    const creationYear = date.getFullYear().toString()
+
+    const creationDate = `${creationDay}/${creationMonth}/${creationYear}`
+    const creationDateTitre = `${creationYear}/${creationMonth}/${creationDay}`
+    const creationHour = addZero(date.getHours()) + "h" + addZero(date.getMinutes())
+    const creationHourTitre = addZero(date.getHours()) + "-" + addZero(date.getMinutes())
 
     const data = [
         `Cree le: ${creationDate} a ${creationHour}`,
@@ -108,7 +111,7 @@ async function generatePdf(profile, reason, pdfBase) {
     }
 
     drawText(profile.city, 78, 76, locationSize)
-    
+
     drawText(`${profile.datesortie}`, 63, 58, 11)
     drawText(`${profile.heuresortie}`, 227, 58, 11)
 

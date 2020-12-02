@@ -1,6 +1,6 @@
 {
   "name": "covid-attestation",
-  "version": "1.0.0",
+  "version": "1.2.1",
   "private": true,
   "description": "Application Express pour générer des attestations de déplacement pour le confinement de fin 2020",
   "author": "Lucas Stoebner & Félix Legrelle",
