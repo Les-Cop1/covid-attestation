@@ -60,7 +60,7 @@ async function generatePdf(profile, reason, pdfBase) {
     const creationYear = date.getFullYear().toString()
 
     const creationDate = `${creationDay}/${creationMonth}/${creationYear}`
-    const creationDateTitre = `${creationYear}/${creationMonth}/${creationDay}`
+    const creationDateTitre = `${creationYear}-${creationMonth}-${creationDay}`
     const creationHour = addZero(date.getHours()) + "h" + addZero(date.getMinutes())
     const creationHourTitre = addZero(date.getHours()) + "-" + addZero(date.getMinutes())
 
