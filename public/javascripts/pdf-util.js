@@ -37,18 +37,17 @@ function generateQR(text) {
 async function generatePdf(profile, reason, pdfBase) {
     let today = new Date();
     today = new Date(today.getTime() - 5000 * 60)
-    today.setTime( today.getTime() - new Date().getTimezoneOffset()*60*1000 )
+    today.setTime(today.getTime() - new Date().getTimezoneOffset() * 60 * 1000)
     let dd = String(today.getDate()).padStart(2, '0');
     let mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
     let yyyy = today.getFullYear();
 
     let creationDate = dd + '/' + mm + '/' + yyyy;
     let creationDateTitre = yyyy + '-' + mm + '-' + dd;
-
     let h = addZero(today.getHours());
     let m = addZero(today.getMinutes());
     let creationHour = h + "h" + m
-    let creationHourTitre = h + "-" + m
+    let creationHourTitre = (h + 1) + "-" + m
     const {
         lastname,
         firstname,
@@ -108,7 +107,7 @@ async function generatePdf(profile, reason, pdfBase) {
     }
 
     drawText(profile.city, 78, 76, locationSize)
-    
+
     drawText(`${profile.datesortie}`, 63, 58, 11)
     drawText(`${profile.heuresortie}`, 227, 58, 11)
 
@@ -119,7 +118,7 @@ async function generatePdf(profile, reason, pdfBase) {
 
     const qrImage = await pdfDoc.embedPng(generatedQR)
 
-    page1.drawText(qrTitle1 + '\n' + qrTitle2, { x: 440, y: 130, size: 6, font, lineHeight: 10, color: rgb(1,1,1) })
+    page1.drawText(qrTitle1 + '\n' + qrTitle2, {x: 440, y: 130, size: 6, font, lineHeight: 10, color: rgb(1, 1, 1)})
 
 
     page1.drawImage(qrImage, {
@@ -131,7 +130,7 @@ async function generatePdf(profile, reason, pdfBase) {
 
     pdfDoc.addPage()
     const page2 = pdfDoc.getPages()[1]
-    page2.drawText(qrTitle1 + qrTitle2, { x: 50, y: page2.getHeight() - 70, size: 11, font, color: rgb(1,1,1) })
+    page2.drawText(qrTitle1 + qrTitle2, {x: 50, y: page2.getHeight() - 70, size: 11, font, color: rgb(1, 1, 1)})
     page2.drawImage(qrImage, {
         x: 50,
         y: page2.getHeight() - 390,
@@ -139,7 +138,7 @@ async function generatePdf(profile, reason, pdfBase) {
         height: 300,
     })
 
-    return {"file":await pdfDoc.save(), title};
+    return {"file": await pdfDoc.save(), title};
 
 }
 
