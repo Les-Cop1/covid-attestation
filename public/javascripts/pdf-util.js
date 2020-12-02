@@ -46,7 +46,7 @@ async function generatePdf(profile, reason, pdfBase) {
     let creationDateTitre = yyyy + '-' + mm + '-' + dd;
     let h = addZero(today.getHours());
     let m = addZero(today.getMinutes());
-    let creationHour = (h+1) + "h" + m
+    let creationHour = h + "h" + m
     let creationHourTitre = h + "-" + m
     const {
         lastname,
