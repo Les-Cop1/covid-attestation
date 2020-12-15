@@ -49,7 +49,7 @@ async function generatePdf(profile, reason, pdfBase) {
         heuresortie,
     } = profile
 
-    const dateSortieFormated = `${datesortie.substr(6, 4)}-${datesortie.substr(3, 2)}-${datesortie.substr(0, 2)}`
+    const dateSortieFormated = `${datesortie.substr(6,4)}-${datesortie.substr(3,2)}-${datesortie.substr(0,2)}`
     let date = new Date(`${dateSortieFormated} ${heuresortie}`)
 
     date.setMinutes(date.getMinutes() - minutesBefore)
