@@ -15,7 +15,7 @@ router.get('/', function (req, res, next) {
 /* POST home page. */
 router.post('/', function (req, res, next) {
     let reason = (req.body["motif"] === undefined) ? '' : req.body["motif"]
-    if (reason==="achats") reason="achats_culturel_cultuel"
+    if (reason==="sport_animaux") reason="animaux"
 
     let adresse = (req.body["adresse"] === undefined) ? '' : req.body["adresse"];
     let dateNaissance = (req.body["dateNaissance"] === undefined) ? '' : req.body["dateNaissance"]
