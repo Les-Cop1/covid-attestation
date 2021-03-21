@@ -59,8 +59,8 @@ const generatePdf = async (profile, reason, pdfBase, mode) => {
 
     const creationDate = dateformat(date, "dd/mm/yyyy")
     const creationDateTitre = dateformat(date, "isoDate")
-    const creationHour = dateformat(date, "hh'h'MM")
-    const creationHourTitre = dateformat(date, "hh-MM")
+    const creationHour = dateformat(date, "HH'h'MM")
+    const creationHourTitre = dateformat(date, "HH-MM")
 
     const data = [
         `Cree le: ${creationDate} a ${creationHour}`,
