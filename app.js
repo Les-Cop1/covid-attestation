@@ -1,16 +1,16 @@
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
-var indexRouter = require('./routes/index');
+const createError = require('http-errors');
+const express = require('express');
+const path = require('path');
+const cookieParser = require('cookie-parser');
+const logger = require('morgan');
+const indexRouter = require('./routes/index');
 const dotenv = require('dotenv')
 dotenv.config()
-var app = express();
+const app = express();
 
-var expressGoogleAnalytics = require('express-google-analytics');
+const expressGoogleAnalytics = require('express-google-analytics');
 if (process.env.GA_TRACKING_ID) {
-    var analytics = expressGoogleAnalytics(process.env.GA_TRACKING_ID);
+    const analytics = expressGoogleAnalytics(process.env.GA_TRACKING_ID);
     app.use(analytics);
 }
 app.use(logger('dev'));

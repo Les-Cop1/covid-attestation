@@ -1,5 +1,5 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
 
 const pdfUtils = require('../public/javascripts/pdf-util')
 
@@ -13,42 +13,31 @@ router.get('/', function (req, res, next) {
 })
 
 /* POST home page. */
-router.post('/', function (req, res, next) {
-    let reason = (req.body["motif"] === undefined) ? '' : req.body["motif"]
-    if (reason==="sport_animaux") reason="animaux"
+router.post('/', (req, res, next) => {
 
-    let adresse = (req.body["adresse"] === undefined) ? '' : req.body["adresse"];
-    let dateNaissance = (req.body["dateNaissance"] === undefined) ? '' : req.body["dateNaissance"]
-    let ville = (req.body["ville"] === undefined) ? '' : req.body["ville"]
-    let dateSortie = (req.body["dateSortie"] === undefined) ? '' : req.body["dateSortie"]
-    let prenom = (req.body["prenom"] === undefined) ? '' : req.body["prenom"]
-    let heureSortie = (req.body["heureSortie"] === undefined) ? '' : req.body["heureSortie"]
-    let nom = (req.body["nom"] === undefined) ? '' : req.body["nom"]
-    let lieuNaissance = (req.body["lieuNaissance"] === undefined) ? '' : req.body["lieuNaissance"]
-    let codePostal = (req.body["codePostal"] === undefined) ? '' : req.body["codePostal"]
+    if (req.body.mode === "jour") {
 
-    let profile = {
-        "address": adresse,
-        "birthday": dateNaissance,
-        "city": ville,
-        "datesortie": dateSortie,
-        "firstname": prenom,
-        "heuresortie": heureSortie,
-        "lastname": nom,
-        "ox - achats": "achats",
-        "ox - convocation": "convocation",
-        "ox - enfants": "enfants",
-        "ox - famille": "famille",
-        "ox - handicap": "handicap",
-        "ox - missions": "missions",
-        "ox - sante": "sante",
-        "ox - sport_animaux": "sport_animaux",
-        "ox - travail": "travail",
-        "placeofbirth": lieuNaissance,
-        "zipcode": codePostal
+    } else if (req.body.mode === "nuit") {
+
+    } else {
+        res.send({success: false, error: "Veuillez mettre à jour le raccourci"})
     }
 
-    getBuffer(profile, reason)
+    let reason = (req.body["motif"] === undefined) ? '' : req.body["motif"]
+
+    let profile = {
+        "address": (req.body["adresse"] === undefined) ? '' : req.body["adresse"],
+        "birthday": (req.body["dateNaissance"] === undefined) ? '' : req.body["dateNaissance"],
+        "city": (req.body["ville"] === undefined) ? '' : req.body["ville"],
+        "datesortie": (req.body["dateSortie"] === undefined) ? '' : req.body["dateSortie"],
+        "firstname": (req.body["prenom"] === undefined) ? '' : req.body["prenom"],
+        "heuresortie": (req.body["heureSortie"] === undefined) ? '' : req.body["heureSortie"],
+        "lastname": (req.body["nom"] === undefined) ? '' : req.body["nom"],
+        "placeofbirth": (req.body["lieuNaissance"] === undefined) ? '' : req.body["lieuNaissance"],
+        "zipcode": (req.body["codePostal"] === undefined) ? '' : req.body["codePostal"]
+    }
+
+    getBuffer(profile, reason, req.body.mode)
         .then(function (pdf) {
             res.type('pdf');
             res.setHeader("Content-disposition", 'filename="' + pdf.title + '.pdf"')
@@ -56,8 +45,9 @@ router.post('/', function (req, res, next) {
         })
 });
 
-async function getBuffer(profile, reason) {
-    return await pdfUtils.generatePdf(profile, reason, './public/assets/certificate.pdf');
+async function getBuffer(profile, reason, mode) {
+    const pdf = mode === "jour" ? './public/assets/quarantine-certificate.pdf' : './public/assets/curfew-certificate.pdf'
+    return await pdfUtils.generatePdf(profile, reason, pdf, mode) ;
 }
 
 
