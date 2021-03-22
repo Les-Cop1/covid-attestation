@@ -46,8 +46,15 @@ router.post('/', (req, res, next) => {
 });
 
 async function getBuffer(profile, reason, mode) {
-    const pdf = mode === "jour" ? './public/assets/quarantine-certificate.pdf' : './public/assets/curfew-certificate.pdf'
-    return await pdfUtils.generatePdf(profile, reason, pdf, mode) ;
+    let pdf
+    if (mode === "jour") {
+        pdf = './public/assets/quarantine-certificate.pdf'
+    } else if (mode === "nuit") {
+        pdf = './public/assets/curfew-certificate.pdf'
+    } else {
+        pdf = './public/assets/update-shortcut.pdf'
+    }
+    return await pdfUtils.generatePdf(profile, reason, pdf, mode);
 }
 
 
