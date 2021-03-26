@@ -9,6 +9,7 @@ let fs = require('fs')
 const generatePdf = async (profile, reason, pdfBase, mode) => {
     // Date de création du fichier x minutes avant la date de sortie
     let pdfDoc
+    let title
     if (mode !== undefined) {
         const minutesBefore = 5
 
@@ -75,7 +76,7 @@ const generatePdf = async (profile, reason, pdfBase, mode) => {
         ].join(';\n ')
 
         pdfDoc = await PDFDocument.load(fs.readFileSync(pdfBase))
-        let title = 'attestation-' + creationDateTitre + "_" + creationHourTitre
+        title = 'attestation-' + creationDateTitre + "_" + creationHourTitre
         pdfDoc.setTitle(title)
         pdfDoc.setSubject('Attestation de déplacement dérogatoire')
         pdfDoc.setKeywords([
