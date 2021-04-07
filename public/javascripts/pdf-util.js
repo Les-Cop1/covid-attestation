@@ -1,53 +1,43 @@
 const QRCode = require('qrcode')
-const PDFLib = require('pdf-lib');
-const rgb = PDFLib.rgb;
-const PDFDocument = PDFLib.PDFDocument;
-const StandardFonts = PDFLib.StandardFonts;
+const PDFLib = require('pdf-lib')
+const PDFDocument = PDFLib.PDFDocument
+const PageSizes = PDFLib.PageSizes
+const rgb = PDFLib.rgb
+const fontkit = require('@pdf-lib/fontkit')
 const dateformat = require('dateformat')
 let fs = require('fs')
+const fetch = require("node-fetch");
 
-const generatePdf = async (profile, reason, pdfBase, mode) => {
+const LucioleFontBase = '../assets/fonts/Luciole-Regular.ttf'
+const LucioleBoldFontBase = '../assets/fonts/Luciole-Bold.ttf'
+const LucioleItalicFontBase = '../assets/fonts/Luciole-Regular-Italic.ttf'
+const LucioleBoldItalicFontBase = '../assets/fonts/Luciole-Bold-Italic.ttf'
+
+const curfewPdfData = '../assets/curfew-pdf-data.js'
+const quarantinePdfData = '../assets/quarantine-pdf-data.js'
+
+const pixelHeight = 1262
+const pixelRatio = 1.49845450880258
+const sizeRatio = 0.66
+
+const generatePdf = async (profile, reason,  mode) => {
     // Date de création du fichier x minutes avant la date de sortie
     let pdfDoc
     let title
     if (mode !== undefined) {
         const minutesBefore = 5
-
-        let positions
+        let pdfData
 
         if (mode === 'jour') {
-            positions = {
-                sport: {page: 1, y: 367},
-                achats: {page: 1, y: 244},
-                enfants: {page: 1, y: 161},
-                culte_culturel: {page: 2, y: 781},
-                demarche: {page: 2, y: 726},
-                travail: {page: 2, y: 629},
-                sante: {page: 2, y: 533},
-                famille: {page: 2, y: 477},
-                handicap: {page: 2, y: 422},
-                judiciaire: {page: 2, y: 380},
-                demenagement: {page: 2, y: 311},
-                transit: {page: 2, y: 243},
-            }
+            pdfData = quarantinePdfData
         } else {
-            positions = {
-                travail: {page: 1, y: 579},
-                sante: {page: 1, y: 546},
-                famille: {page: 1, y: 512},
-                handicap: {page: 1, y: 478},
-                judiciaire: {page: 1, y: 458},
-                missions: {page: 1, y: 412},
-                transit: {page: 1, y: 379},
-                animaux: {page: 1, y: 345},
-            }
+            pdfData = curfewPdfData
         }
 
         const {
             lastname,
             firstname,
             birthday,
-            placeofbirth,
             address,
             zipcode,
             city,
@@ -69,13 +59,17 @@ const generatePdf = async (profile, reason, pdfBase, mode) => {
             `Cree le: ${creationDate} a ${creationHour}`,
             `Nom: ${lastname}`,
             `Prenom: ${firstname}`,
-            `Naissance: ${birthday} a ${placeofbirth}`,
+            `Naissance: ${birthday}`,
             `Adresse: ${address} ${zipcode} ${city}`,
             `Sortie: ${datesortie} a ${heuresortie}`,
             `Motifs: ${reason}`,
+            '', // Pour ajouter un ; aussi au dernier élément
         ].join(';\n ')
 
-        pdfDoc = await PDFDocument.load(fs.readFileSync(pdfBase))
+        pdfDoc = await PDFDocument.create()
+        pdfDoc.registerFontkit(fontkit)
+        pdfDoc.addPage(PageSizes.A4)
+
         title = 'attestation-' + creationDateTitre + "_" + creationHourTitre
         pdfDoc.setTitle(title)
         pdfDoc.setSubject('Attestation de déplacement dérogatoire')
@@ -92,50 +86,67 @@ const generatePdf = async (profile, reason, pdfBase, mode) => {
         pdfDoc.setCreator('Lucas & Félix')
         pdfDoc.setAuthor("Ministère de l'intérieur")
 
+        let fontBuffer = await fetch(LucioleFontBase).then(res => res.arrayBuffer())
+        const fontLuciole = await pdfDoc.embedFont(fontBuffer)
+        fontBuffer = await fetch(LucioleBoldFontBase).then(res => res.arrayBuffer())
+        const fontLucioleBold = await pdfDoc.embedFont(fontBuffer)
+        fontBuffer = await fetch(LucioleItalicFontBase).then(res => res.arrayBuffer())
+        const fontLucioleItalic = await pdfDoc.embedFont(fontBuffer)
+        fontBuffer = await fetch(LucioleBoldItalicFontBase).then(res => res.arrayBuffer())
+        const fontLucioleBoldItalic = await pdfDoc.embedFont(fontBuffer)
 
-        const page1 = pdfDoc.getPages()[0]
-        const page2 = pdfDoc.getPages()[1]
+        let pages = pdfDoc.getPages()
+        let pageIdx = 0
+        let page = pages[0]
+        let x = 0
+        let y = 0
+        let size = 0
+        let font = fontLuciole
 
-        const font = await pdfDoc.embedFont(StandardFonts.Helvetica)
-        const drawText = (text, x, y, size = 11) => {
-            page1.drawText(text, {x, y, size, font})
-        }
-        const drawText2 = (text, x, y, size = 11) => {
-            page2.drawText(text, {x, y, size, font})
-        }
+        pdfData.forEach(item => {
+            const itemPageIdx = item.page - 1 || 0
+            if (itemPageIdx !== pageIdx) {
+                if (item.page > pages.length) {
+                    pdfDoc.addPage(PageSizes.A4)
+                    pages = pdfDoc.getPages()
+                }
+                pageIdx = itemPageIdx
+                page = pages[pageIdx]
+            }
+            x = 0
+            y = 0
+            size = Number((item.size * sizeRatio).toFixed(2)) || 10
+            font = item.font === 'LucioleBold'
+                ? fontLucioleBold
+                : item.font === 'LucioleItalic'
+                    ? fontLucioleItalic
+                    : item.font === 'LucioleBoldItalic'
+                        ? fontLucioleBoldItalic
+                        : fontLuciole
 
-        let locationSize = getIdealFontSize(font, profile.city, 83, 7, 11)
-
-        if (!locationSize) {
-            locationSize = 7
-        }
-
-        let reasonX = 73
-        if (mode === 'jour') {
-            drawText(`${firstname} ${lastname}`, 111, 516)
-            drawText(birthday, 111, 501)
-            drawText(placeofbirth, 228, 501)
-            drawText(`${address} ${zipcode} ${city}`, 126, 487)
-
-            drawText2(`Fait à ${profile.city}`, 72, 99, locationSize)
-            drawText2(`Le ${profile.datesortie}`, 72, 83, 11)
-            drawText2(`à ${profile.heuresortie}`, 310, 83, 11)
-            drawText2('(Date et heure de début de sortie à mentionner obligatoirement)', 72, 67, 11)
-            reasonX = 60
-        } else {
-            drawText(`${firstname} ${lastname}`, 144, 705)
-            drawText(birthday, 144, 684)
-            drawText(placeofbirth, 310, 684)
-            drawText(`${address} ${zipcode} ${city}`, 148, 665)
-
-            drawText(`Fait à ${profile.city}`, 72, 109, locationSize)
-            drawText(`Le ${profile.datesortie}`, 72, 93, 11)
-            drawText(`à ${profile.heuresortie}`, 310, 93, 11)
-            drawText('(Date et heure de début de sortie à mentionner obligatoirement)', 72, 77, 11)
-        }
-
-        positions[reason].page === 2 ? drawText2('x', reasonX, positions[reason].y || 0, 12) : drawText('x', reasonX, positions[reason].y || 0, 12)
-
+            if (item.top) {
+                x = item.left / pixelRatio
+                y = (pixelHeight - item.top) / pixelRatio
+            } else {
+                x = item.x
+                y = item.y
+            }
+            const label = item.label || ''
+            let text = item.variablesNames ? item.variablesNames.reduce((acc, name) => acc + ' ' + profile[name], label) : label
+            if (item.type === 'text') {
+                page.drawText(text, { x, y, size, font })
+            }
+            if (item.type === 'input') {
+                text = item.inputs.reduce((acc, cur) => acc + ' ' + profile[cur], text)
+                page.drawText(text, { x, y, size, font })
+            }
+            if (item.type === 'checkbox') {
+                const xc = x - 16
+                const checkbox = reasons.split(', ').includes(item.reason) ? '[x]' : '[ ]'
+                page.drawText(checkbox, { x: xc, y, size, font })
+                page.drawText(label, { x, y, size, font })
+            }
+        })
 
         const qrTitle1 = 'QR-code contenant les informations '
         const qrTitle2 = 'de votre attestation numérique'
@@ -143,32 +154,18 @@ const generatePdf = async (profile, reason, pdfBase, mode) => {
         const generatedQR = await generateQR(data)
 
         const qrImage = await pdfDoc.embedPng(generatedQR)
-        let pageX0 = pdfDoc.getPages()[0]
-        if (mode === 'jour') {
-            pageX0 = pdfDoc.getPages()[2 - 1]
-        }
-        pageX0.drawText(qrTitle1 + '\n' + qrTitle2, {
-            x: 470,
-            y: 182,
-            size: 6,
-            font,
-            lineHeight: 10,
-            color: rgb(1, 1, 1)
-        })
-
+        const pageX0 = pdfDoc.getPages()[0]
+        pageX0.drawText(qrTitle1 + '\n' + qrTitle2, { x: 470, y: 121, size: 6, font, lineHeight: 10, color: rgb(1, 1, 1) })
         pageX0.drawImage(qrImage, {
             x: pageX0.getWidth() - 107,
-            y: 80,
+            y: 21,
             width: 82,
             height: 82,
         })
 
         pdfDoc.addPage()
-        let pageX = pdfDoc.getPages()[1]
-        if (mode === 'jour') {
-            pageX = pdfDoc.getPages()[2]
-        }
-        pageX.drawText(qrTitle1 + qrTitle2, {x: 50, y: pageX.getHeight() - 70, size: 11, font, color: rgb(1, 1, 1)})
+        const pageX = pdfDoc.getPages()[1]
+        pageX.drawText(qrTitle1 + qrTitle2, { x: 50, y: pageX.getHeight() - 70, size: 11, font, color: rgb(1, 1, 1) })
         pageX.drawImage(qrImage, {
             x: 50,
             y: pageX.getHeight() - 390,
@@ -176,7 +173,7 @@ const generatePdf = async (profile, reason, pdfBase, mode) => {
             height: 300,
         })
     } else {
-        pdfDoc = await PDFDocument.load(fs.readFileSync(pdfBase))
+        pdfDoc = await PDFDocument.load(fs.readFileSync('../assets/update-shortcut.pdf'))
     }
 
     return {"file": await pdfDoc.save(), title};
@@ -191,17 +188,6 @@ const generateQR = (text) => {
         margin: 1,
     }
     return QRCode.toDataURL(text, opts)
-}
-
-const getIdealFontSize = (font, text, maxWidth, minSize, defaultSize) => {
-    let currentSize = defaultSize
-    let textWidth = font.widthOfTextAtSize(text, defaultSize)
-
-    while (textWidth > maxWidth && currentSize > minSize) {
-        textWidth = font.widthOfTextAtSize(text, --currentSize)
-    }
-
-    return textWidth > maxWidth ? null : currentSize
 }
 
 module.exports = {generatePdf}

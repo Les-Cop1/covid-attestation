@@ -33,7 +33,6 @@ router.post('/', (req, res, next) => {
         "firstname": (req.body["prenom"] === undefined) ? '' : req.body["prenom"],
         "heuresortie": (req.body["heureSortie"] === undefined) ? '' : req.body["heureSortie"],
         "lastname": (req.body["nom"] === undefined) ? '' : req.body["nom"],
-        "placeofbirth": (req.body["lieuNaissance"] === undefined) ? '' : req.body["lieuNaissance"],
         "zipcode": (req.body["codePostal"] === undefined) ? '' : req.body["codePostal"]
     }
 
@@ -46,15 +45,7 @@ router.post('/', (req, res, next) => {
 });
 
 async function getBuffer(profile, reason, mode) {
-    let pdf
-    if (mode === "jour") {
-        pdf = './public/assets/quarantine-certificate.pdf'
-    } else if (mode === "nuit") {
-        pdf = './public/assets/curfew-certificate.pdf'
-    } else {
-        pdf = './public/assets/update-shortcut.pdf'
-    }
-    return await pdfUtils.generatePdf(profile, reason, pdf, mode);
+    return await pdfUtils.generatePdf(profile, reason, mode);
 }
 
 
