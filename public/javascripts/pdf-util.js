@@ -8,10 +8,10 @@ const dateformat = require('dateformat')
 let fs = require('fs')
 const fetch = require("node-fetch");
 
-const LucioleFontBase = '../assets/fonts/Luciole-Regular.ttf'
-const LucioleBoldFontBase = '../assets/fonts/Luciole-Bold.ttf'
-const LucioleItalicFontBase = '../assets/fonts/Luciole-Regular-Italic.ttf'
-const LucioleBoldItalicFontBase = '../assets/fonts/Luciole-Bold-Italic.ttf'
+const LucioleFontBase = '/public/assets/fonts/Luciole-Regular.ttf'
+const LucioleBoldFontBase = '/public/assets/fonts/Luciole-Bold.ttf'
+const LucioleItalicFontBase = '/public/assets/fonts/Luciole-Regular-Italic.ttf'
+const LucioleBoldItalicFontBase = '/public/assets/fonts/Luciole-Bold-Italic.ttf'
 
 const curfewPdfData = '../assets/curfew-pdf-data.js'
 const quarantinePdfData = '../assets/quarantine-pdf-data.js'
@@ -20,7 +20,7 @@ const pixelHeight = 1262
 const pixelRatio = 1.49845450880258
 const sizeRatio = 0.66
 
-const generatePdf = async (profile, reason,  mode) => {
+const generatePdf = async (profile, reason,  mode, url) => {
     // Date de création du fichier x minutes avant la date de sortie
     let pdfDoc
     let title
@@ -85,14 +85,15 @@ const generatePdf = async (profile, reason,  mode) => {
         pdfDoc.setProducer('DNUM/SDIT')
         pdfDoc.setCreator('Lucas & Félix')
         pdfDoc.setAuthor("Ministère de l'intérieur")
-
-        let fontBuffer = await fetch(LucioleFontBase).then(res => res.arrayBuffer())
+        console.log(url)
+        console.log(new URL(LucioleFontBase, "https://"+url).href)
+        let fontBuffer = await fetch(new URL(LucioleFontBase, "https://"+url).href).then(res => res.arrayBuffer())
         const fontLuciole = await pdfDoc.embedFont(fontBuffer)
-        fontBuffer = await fetch(LucioleBoldFontBase).then(res => res.arrayBuffer())
+        fontBuffer = await fetch(new URL(LucioleBoldFontBase, "https://"+url).href).then(res => res.arrayBuffer())
         const fontLucioleBold = await pdfDoc.embedFont(fontBuffer)
-        fontBuffer = await fetch(LucioleItalicFontBase).then(res => res.arrayBuffer())
+        fontBuffer = await fetch(new URL(LucioleItalicFontBase, "https://"+url).href).then(res => res.arrayBuffer())
         const fontLucioleItalic = await pdfDoc.embedFont(fontBuffer)
-        fontBuffer = await fetch(LucioleBoldItalicFontBase).then(res => res.arrayBuffer())
+        fontBuffer = await fetch(new URL(LucioleBoldItalicFontBase, "https://"+url).href).then(res => res.arrayBuffer())
         const fontLucioleBoldItalic = await pdfDoc.embedFont(fontBuffer)
 
         let pages = pdfDoc.getPages()
