@@ -5,6 +5,7 @@ import axios from "axios";
 const App = () => {
 
   const [shortcutLink, setShortcutLink] = useState("")
+  const [updateDate, setUpdateDate] = useState("")
 
   useEffect(() => {
     let baseUrl
@@ -18,6 +19,7 @@ const App = () => {
     axios.get(baseUrl + "/api/getLastShortcut")
         .then(({data}) => {
           setShortcutLink(data.shortcut)
+          setUpdateDate(data.updateDate)
         })
   }, [])
 
@@ -35,7 +37,7 @@ const App = () => {
             Obtenir le raccourci
           </a>
         }
-
+        <p>Mis à jour le : {updateDate}</p>
         <p>
           Code source :&nbsp;
           <a

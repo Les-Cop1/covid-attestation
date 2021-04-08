@@ -19,7 +19,8 @@ if (process.env.ENVIRONEMENT === 'dev') {
 
 router.get('/getLastShortcut', cors(), (req, res, next) => {
     res.send({
-        shortcut: process.env.SHORTCUT
+        shortcut: process.env.SHORTCUT,
+        updateDate: process.env.UPDATE_DATE
     })
 })
 
