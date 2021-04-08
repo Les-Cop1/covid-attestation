@@ -8,7 +8,7 @@ router.get('/', function (req, res, next) {
     res.status(400).send({
         success: false,
         error: "Bad request",
-        documentation: "https://github.com/Les-Cop1/covid-attesation"
+        documentation: "https://github.com/Les-Cop1/covid-attestation"
     });
 })
 
