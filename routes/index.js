@@ -36,7 +36,7 @@ router.post('/', (req, res, next) => {
         "zipcode": (req.body["codePostal"] === undefined) ? '' : req.body["codePostal"]
     }
 
-    getBuffer(profile, reason, req.body.mode,req.get('host'))
+    getBuffer(profile, reason, req.body.mode)
         .then(function (pdf) {
             res.type('pdf');
             res.setHeader("Content-disposition", 'filename="' + pdf.title + '.pdf"')
@@ -44,8 +44,8 @@ router.post('/', (req, res, next) => {
         })
 });
 
-async function getBuffer(profile, reason, mode, url) {
-    return await pdfUtils.generatePdf(profile, reason, mode, url);
+async function getBuffer(profile, reason, mode) {
+    return await pdfUtils.generatePdf(profile, reason, mode);
 }
 
 
