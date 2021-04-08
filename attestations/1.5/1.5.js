@@ -4,10 +4,31 @@ const PDFDocument = PDFLib.PDFDocument
 const PageSizes = PDFLib.PageSizes
 const rgb = PDFLib.rgb
 const dateformat = require('dateformat')
-let fs = require('fs')
 
-const curfewPdfData = require('../assets/curfew-pdf-data.js')
-const quarantinePdfData = require('../assets/quarantine-pdf-data.js')
+const curfewPdfData = require('./assets/curfew-pdf-data.js')
+const quarantinePdfData = require('./assets/quarantine-pdf-data.js')
+
+const generateAttestation = async (postData) => {
+
+    let reason = (postData["motif"] === undefined) ? '' : postData["motif"]
+
+    let profile = {
+        "address": (postData["adresse"] === undefined) ? '' : postData["adresse"],
+        "birthday": (postData["dateNaissance"] === undefined) ? '' : postData["dateNaissance"],
+        "city": (postData["ville"] === undefined) ? '' : postData["ville"],
+        "datesortie": (postData["dateSortie"] === undefined) ? '' : postData["dateSortie"],
+        "firstname": (postData["prenom"] === undefined) ? '' : postData["prenom"],
+        "heuresortie": (postData["heureSortie"] === undefined) ? '' : postData["heureSortie"],
+        "lastname": (postData["nom"] === undefined) ? '' : postData["nom"],
+        "zipcode": (postData["codePostal"] === undefined) ? '' : postData["codePostal"]
+    }
+
+    return await getBuffer(profile, reason, postData.mode)
+}
+
+async function getBuffer(profile, reason, mode) {
+    return await generatePdf(profile, reason, mode);
+}
 
 const pixelHeight = 1262
 const pixelRatio = 1.49845450880258
@@ -147,8 +168,6 @@ const generatePdf = async (profile, reason,  mode) => {
             width: 300,
             height: 300,
         })
-    } else {
-        pdfDoc = await PDFDocument.load(fs.readFileSync('../assets/update-shortcut.pdf'))
     }
 
     return {"file": await pdfDoc.save(), title};
@@ -165,4 +184,4 @@ const generateQR = (text) => {
     return QRCode.toDataURL(text, opts)
 }
 
-module.exports = {generatePdf}
+module.exports = generateAttestation
