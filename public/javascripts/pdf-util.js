@@ -84,7 +84,6 @@ const generatePdf = async (profile, reason,  mode) => {
         let x = 0
         let y = 0
         let size = 0
-        console.log(pdfData)
         pdfData.forEach(item => {
             const itemPageIdx = item.page - 1 || 0
             if (itemPageIdx !== pageIdx) {
